@@ -1,0 +1,27 @@
+# === SECRETS — never commit these ===
+   .env
+   .env.*
+   *.key
+   *_key.txt
+   secrets.yaml
+   config.local.yaml
+
+   # === Python ===
+   __pycache__/
+   *.py[cod]
+   *.egg-info/
+   .venv/
+   venv/
+   env/
+
+   # === runtime output ===
+   cache/
+   logs/
+   *.log
+
+   # === OS / editor cruft ===
+   .DS_Store
+   Thumbs.db
+   .idea/
+   .vscode/
+   *.swp
