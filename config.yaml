@@ -1,0 +1,97 @@
+# =============================================================================
+# StockAI - Single source of truth for ALL settings
+# Nothing sensitive or tunable is hardcoded anywhere else. Change it here.
+# =============================================================================
+
+# --- API keys & secrets ------------------------------------------------------
+# ⚠️  PUBLIC REPO — DO NOT PUT REAL KEYS HERE. This file is committed to git and
+#     visible to everyone. Leave these blank. Set keys as environment variables
+#     in your terminal instead (they never touch any committed file):
+#       export STOCKAI_ANTHROPIC_KEY="sk-ant-..."
+#       export STOCKAI_DATA_KEY="your-alphavantage-key"
+#     If you ever paste a real key below and commit it, rotate that key
+#     immediately — bots scan public GitHub for keys within seconds.
+secrets:
+  telegram_bot_token: ""      # env: STOCKAI_TELEGRAM_TOKEN
+  telegram_chat_id: ""        # env: STOCKAI_TELEGRAM_CHAT_ID
+  anthropic_api_key: ""       # env: STOCKAI_ANTHROPIC_KEY
+  # Market data source key (Phase 1 uses a free source; swap as you like)
+  data_provider_key: ""       # env: STOCKAI_DATA_KEY
+
+# --- Universe: the list of stocks we screen ----------------------------------
+# NSE symbols. Keep this list as long or short as you want.
+# The screener runs over ALL of these; only survivors go to the debate.
+universe:
+  source: "static"           # "static" = use the list below
+  symbols:
+    - RELIANCE
+    - TCS
+    - INFY
+    - HDFCBANK
+    - ICICIBANK
+    - DEVYANI
+    - FINCABLES
+    - LUMAXTECH
+    - TATAMOTORS
+    - SBIN
+    - AXISBANK
+    - LT
+    - ITC
+    - BHARTIARTL
+    - MARUTI
+
+# --- Screener thresholds -----------------------------------------------------
+# A stock must pass ALL enabled checks to be shortlisted.
+# Set enabled: false to skip any check.
+screener:
+  min_price: 20              # rupees; drop penny stocks
+  max_price: 100000          # rupees; sanity ceiling
+  volume_breakout:
+    enabled: true
+    lookback_days: 20        # average volume window
+    multiple: 2.0            # today's volume must be >= 2x the 20d average
+  price_above_sma:
+    enabled: true
+    sma_days: 50             # close must be above the 50-day SMA
+  min_pct_change:
+    enabled: true
+    value: 2.0               # today's move must be >= +2%
+  max_shortlist: 5           # never send more than this many to the debate
+
+# --- Debate settings (used in Phase 3, listed here so it all lives together) -
+debate:
+  model: "claude-sonnet-4-5" # model string for the API
+  max_tokens_per_agent: 700
+  rounds: 1                  # bull -> bear -> judge = 1 round
+  # Token-budget guard (Phase 2). These bound the cost BEFORE any API call.
+  token_budget:
+    max_stocks_to_debate: 5      # hard ceiling; must be <= screener.max_shortlist
+    max_tokens_per_run: 30000    # if the estimate exceeds this, refuse to run
+    # Rough $ per 1M tokens for the chosen model, for cost display only.
+    # Update these to match current pricing; they never affect what's sent.
+    usd_per_1m_input: 3.00
+    usd_per_1m_output: 15.00
+
+# --- Schedule (used in Phase 5) ----------------------------------------------
+schedule:
+  enabled: false             # Phase 5 turns this on
+  run_time: "16:00"          # 24h clock, Asia/Kolkata
+  timezone: "Asia/Kolkata"
+  weekdays_only: true
+
+# --- Alert / disclaimer ------------------------------------------------------
+alerts:
+  disclaimer: >-
+    Research/education only. Not investment advice. This is an automated
+    screen, not a recommendation to buy or sell. Do your own diligence.
+  include_bear_case: true    # enforced true in code regardless
+  # Verdict wording. "research" = Accumulate/Watch/Avoid (recommended, honest
+  # framing). "trading" = Buy/Hold/Avoid (the literal trading words). Either
+  # way the signal maps from the same green/amber/red the Judge assigns.
+  verdict_style: "research"
+
+# --- Runtime -----------------------------------------------------------------
+runtime:
+  data_cache_dir: "./cache"
+  log_dir: "./logs"
+  dry_run: true              # true = print alerts instead of sending to Telegram
