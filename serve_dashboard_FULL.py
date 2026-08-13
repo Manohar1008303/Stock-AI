@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local server for the layrs desk dashboard.
+"""Local server for Manohar's Stock Desk dashboard.
 
 Runs everything on YOUR machine. Your API keys live here, server-side, and are
 NEVER sent to the browser. The browser only receives finished analysis results.
@@ -57,6 +57,68 @@ def _recent_closes(symbol, n=30):
         return []
 
 
+def _trade_plan(symbol, close):
+    """Compute a swing trade plan from real price data using ATR.
+
+    All levels derive from 14-day ATR (true daily range) - nothing invented.
+    Rules (standard swing practice):
+      entry zone : close .. close + 0.3*ATR   (enter on the move, don't chase)
+      stop       : entry_low - 1.5*ATR        (below structure; setup fails here)
+      target 1   : entry_low + 2*ATR          (~first scale-out)
+      target 2   : entry_low + 4*ATR          (let it run)
+      R:R        : (target-entry)/(entry-stop) - pure math
+    Returns dict of levels, or None if we can't get enough bars (then we say so).
+    """
+    try:
+        import requests
+        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}.NS"
+        r = requests.get(url, params={"range": "3mo", "interval": "1d"},
+                         headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+        if r.status_code != 200:
+            return None
+        res = r.json().get("chart", {}).get("result", [{}])[0]
+        q = res.get("indicators", {}).get("quote", [{}])[0]
+        highs = q.get("high") or []
+        lows = q.get("low") or []
+        closes = q.get("close") or []
+        # keep only complete bars
+        bars = [(h, l, c) for h, l, c in zip(highs, lows, closes)
+                if None not in (h, l, c)]
+        if len(bars) < 15:
+            return None
+        # True Range per bar, then 14-period average
+        trs = []
+        for i in range(1, len(bars)):
+            h, l, _ = bars[i]
+            prev_c = bars[i - 1][2]
+            tr = max(h - l, abs(h - prev_c), abs(l - prev_c))
+            trs.append(tr)
+        atr = sum(trs[-14:]) / 14
+        if atr <= 0:
+            return None
+        entry_low = close
+        entry_high = close + 0.3 * atr
+        stop = entry_low - 1.5 * atr
+        t1 = entry_low + 2 * atr
+        t2 = entry_low + 4 * atr
+        risk = entry_low - stop
+        rr1 = (t1 - entry_low) / risk if risk > 0 else None
+        rr2 = (t2 - entry_low) / risk if risk > 0 else None
+
+        def rup(x):
+            return round(x, 2)
+        return {
+            "atr": rup(atr),
+            "entry_low": rup(entry_low), "entry_high": rup(entry_high),
+            "stop": rup(stop), "t1": rup(t1), "t2": rup(t2),
+            "rr1": round(rr1, 1) if rr1 else None,
+            "rr2": round(rr2, 1) if rr2 else None,
+            "risk_per_share": rup(risk),
+        }
+    except Exception:
+        return None
+
+
 def _analyze_briefs(briefs, config, universe_n, note=""):
     """Shared: run the extra agents + debate over a list of briefs.
 
@@ -85,10 +147,12 @@ def _analyze_briefs(briefs, config, universe_n, note=""):
         any_detail = any(v not in ("no data",) for v in details.values())
         # recent closes for the sparkline (best-effort; empty if unavailable)
         spark = _recent_closes(b.symbol)
+        # computed swing trade plan (entry/stop/targets/R:R from real ATR)
+        plan = _trade_plan(b.symbol, b.close)
         stocks.append({
             "symbol": b.symbol, "close": b.close, "pct_change": b.pct_change,
             "rvol": round(b.volume_multiple, 1), "sma": b.sma,
-            "technician": tech.summary(), "spark": spark,
+            "technician": tech.summary(), "spark": spark, "plan": plan,
             "fundamentals": {"ok": fund.ok or any_detail, "pe": fund.pe,
                              "target": fund.target, "summary": fund.summary(),
                              "details": details},
@@ -233,7 +297,7 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     print("=" * 60)
-    print("layrs desk - local server")
+    print("Manohar's Stock Desk - local server")
     print("=" * 60)
     config = load_config()
     has_anthropic = bool(config.secret("anthropic_api_key"))
