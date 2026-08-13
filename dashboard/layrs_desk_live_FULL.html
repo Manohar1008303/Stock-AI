@@ -255,6 +255,63 @@
     text-transform:uppercase;letter-spacing:0.4px}
   .spark-wrap svg{flex:1;height:34px}
 
+  /* trade plan (entry / stop / targets / R:R) */
+  .plan{padding:14px 20px;border-bottom:1px solid var(--line)}
+  .plan h4{font-size:11px;font-family:var(--mono);text-transform:uppercase;
+    letter-spacing:0.5px;color:var(--muted);margin-bottom:12px;display:flex;
+    align-items:center;gap:7px;justify-content:space-between}
+  .plan h4 .calc-tag{font-size:9px;color:var(--muted-2);text-transform:none;
+    letter-spacing:0;font-weight:400}
+  .plan-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  @media(max-width:640px){.plan-grid{grid-template-columns:repeat(2,1fr)}}
+  .pcell{background:var(--panel-2);border-radius:8px;padding:10px 12px;
+    border:1px solid var(--line)}
+  .pcell .pk{font-size:9px;color:var(--muted-2);font-family:var(--mono);
+    text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+  .pcell .pv{font-size:15px;font-family:var(--mono);font-weight:600;color:var(--paper)}
+  .pcell.entry{border-left:2px solid var(--signal)}
+  .pcell.stop{border-left:2px solid var(--bear)}
+  .pcell.t1{border-left:2px solid var(--bull)}
+  .pcell.t2{border-left:2px solid var(--bull)}
+  .pcell .rr{font-size:10px;color:var(--muted);margin-top:2px}
+  .plan-rail{height:8px;border-radius:4px;margin:14px 0 4px;position:relative;
+    background:linear-gradient(90deg,var(--bear) 0%,var(--bear) 22%,var(--panel-2) 22%,var(--panel-2) 38%,var(--bull) 38%,var(--bull) 100%)}
+  .plan-rail .marker{position:absolute;top:-4px;width:2px;height:16px;background:var(--paper)}
+  .plan-rail-labels{display:flex;justify-content:space-between;font-family:var(--mono);
+    font-size:9px;color:var(--muted-2)}
+
+  /* levels: 52wk range + DMAs */
+  .levels{padding:14px 20px;border-bottom:1px solid var(--line)}
+  .levels h4{font-size:11px;font-family:var(--mono);text-transform:uppercase;
+    letter-spacing:0.5px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+  .range-bar{height:8px;background:var(--panel-2);border-radius:4px;position:relative;margin:8px 0 3px}
+  .range-bar .fill52{position:absolute;height:100%;border-radius:4px;
+    background:linear-gradient(90deg,var(--bear-dim),var(--signal),var(--bull-dim))}
+  .range-bar .now{position:absolute;top:-4px;width:2px;height:16px;background:var(--paper)}
+  .range-ends{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--muted-2)}
+  .dma-row{display:flex;gap:10px;margin-top:12px}
+  .dma{flex:1;background:var(--panel-2);border-radius:8px;padding:9px 12px;border:1px solid var(--line)}
+  .dma .dmak{font-size:9px;color:var(--muted-2);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.4px}
+  .dma .dmav{font-size:13px;font-family:var(--mono);font-weight:600;color:var(--paper)}
+  .dma .dmad{font-size:10px;font-family:var(--mono);margin-top:2px}
+  .dma .dmad.above{color:var(--bull)}
+  .dma .dmad.below{color:var(--bear)}
+
+  /* position-size calculator */
+  .poscalc{padding:14px 20px;border-bottom:1px solid var(--line);background:var(--panel-2)}
+  .poscalc h4{font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+  .pc-inputs{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+  .pc-field{display:flex;flex-direction:column;gap:4px}
+  .pc-field label{font-size:9px;color:var(--muted-2);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.4px}
+  .pc-field input{background:var(--panel);border:1px solid var(--line-2);border-radius:6px;
+    padding:7px 10px;color:var(--paper);font-family:var(--mono);font-size:13px;width:130px}
+  .pc-field input:focus{outline:none;border-color:var(--signal)}
+  .pc-out{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media(max-width:640px){.pc-out{grid-template-columns:1fr}}
+  .pc-out .pco{background:var(--panel);border-radius:8px;padding:10px 12px;border:1px solid var(--line)}
+  .pc-out .pcok{font-size:9px;color:var(--muted-2);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px}
+  .pc-out .pcov{font-size:16px;font-family:var(--mono);font-weight:600;color:var(--signal)}
+
   .demo-note{margin-top:26px;padding:13px 16px;background:var(--ink-2);
     border:1px solid var(--line);border-radius:10px;font-size:11.5px;color:var(--muted);
     font-family:var(--mono);line-height:1.6;display:flex;gap:10px;align-items:flex-start}
@@ -265,7 +322,8 @@
 </head>
 <body>
 <div class="wrap">
- <h1 class="sr">Manohar's Stock Desk — multi-agent Indian equity analysis</h1>
+  <h1 class="sr">Manohar's Stock Desk — multi-agent Indian equity analysis</h1>
+
   <header>
     <div class="brand">
       <div class="logo">
@@ -517,6 +575,31 @@ async function execute(endpoint, statusMsg){
   btn.disabled=false; aBtn.disabled=false; running=false;
 }
 
+// Position-size calculator: shares = (capital * risk%) / risk-per-share
+function sizeIt(cid, entry, stop){
+  const cap=parseFloat(document.getElementById(cid+'_cap').value)||0;
+  const riskPct=parseFloat(document.getElementById(cid+'_risk').value)||0;
+  const riskPerShare=Math.abs(entry-stop);
+  const f=n=>'₹'+Number(Math.round(n)).toLocaleString('en-IN');
+  if(cap<=0||riskPct<=0||riskPerShare<=0){
+    document.getElementById(cid+'_sh').textContent='—';
+    document.getElementById(cid+'_val').textContent='—';
+    document.getElementById(cid+'_loss').textContent='—';
+    return;
+  }
+  const riskAmt=cap*(riskPct/100);
+  let shares=Math.floor(riskAmt/riskPerShare);
+  // cap position at 100% of capital
+  const maxShares=Math.floor(cap/entry);
+  let capped=false;
+  if(shares>maxShares){shares=maxShares;capped=true;}
+  const posVal=shares*entry;
+  const maxLoss=shares*riskPerShare;
+  document.getElementById(cid+'_sh').textContent=shares.toLocaleString('en-IN')+(capped?' *':'');
+  document.getElementById(cid+'_val').textContent=f(posVal);
+  document.getElementById(cid+'_loss').textContent=f(maxLoss);
+}
+
 function renderLive(data){
   const list=$('verdictList'); list.innerHTML='';
   const D = data.debate;
@@ -628,6 +711,66 @@ function renderLive(data){
 
     const vStyle = (data.verdict_style)||'research';
 
+    // Trade plan card (entry/stop/targets/R:R) - all computed from ATR
+    function tradePlan(p){
+      if(!p) return '<div class="plan"><h4>trade plan</h4><p class="nodata">Not enough price history to compute levels for this symbol.</p></div>';
+      const f=n=>'₹'+Number(n).toLocaleString('en-IN',{minimumFractionDigits:2});
+      return `<div class="plan">
+        <h4><span><i class="ti ti-map-2"></i> trade plan</span><span class="calc-tag">calculated from ${p.atr} ATR · not advice</span></h4>
+        <div class="plan-grid">
+          <div class="pcell entry"><div class="pk">entry zone</div><div class="pv">${f(p.entry_low)}–${p.entry_high}</div></div>
+          <div class="pcell stop"><div class="pk">stop-loss</div><div class="pv">${f(p.stop)}</div><div class="rr">risk ${f(p.risk_per_share)}/sh</div></div>
+          <div class="pcell t1"><div class="pk">target 1</div><div class="pv">${f(p.t1)}</div><div class="rr">R:R ${p.rr1}</div></div>
+          <div class="pcell t2"><div class="pk">target 2</div><div class="pv">${f(p.t2)}</div><div class="rr">R:R ${p.rr2}</div></div>
+        </div>
+        <div class="plan-rail-labels" style="margin-top:12px"><span>stop ${p.stop}</span><span>entry ${p.entry_low}</span><span>T1 ${p.t1}</span><span>T2 ${p.t2}</span></div>
+      </div>`;
+    }
+
+    // Levels: 52wk range position + DMAs with distance
+    function levels(det, close){
+      if(!det) return '';
+      const hi=parseFloat(String(det.week52_high).replace(/[^0-9.]/g,''));
+      const lo=parseFloat(String(det.week52_low).replace(/[^0-9.]/g,''));
+      const ma50=parseFloat(String(det.ma50).replace(/[^0-9.]/g,''));
+      const ma200=parseFloat(String(det.ma200).replace(/[^0-9.]/g,''));
+      let rangeHtml='';
+      if(hi && lo && hi>lo){
+        const pos=Math.max(0,Math.min(100,((close-lo)/(hi-lo))*100));
+        rangeHtml=`<div class="range-bar"><div class="fill52" style="width:100%"></div><div class="now" style="left:${pos}%"></div></div>
+          <div class="range-ends"><span>52w low ${lo}</span><span>now ${close}</span><span>52w high ${hi}</span></div>`;
+      }
+      function dmaCell(label,val){
+        if(!val) return `<div class="dma"><div class="dmak">${label}</div><div class="dmav">no data</div></div>`;
+        const diff=((close-val)/val*100);
+        const cls=diff>=0?'above':'below';
+        const sign=diff>=0?'+':'';
+        return `<div class="dma"><div class="dmak">${label}</div><div class="dmav">₹${val}</div><div class="dmad ${cls}">${sign}${diff.toFixed(1)}% ${diff>=0?'above':'below'}</div></div>`;
+      }
+      if(!rangeHtml && !ma50 && !ma200) return '';
+      return `<div class="levels"><h4><i class="ti ti-ruler-2"></i> key levels</h4>
+        ${rangeHtml}
+        <div class="dma-row">${dmaCell('50-day MA',ma50)}${dmaCell('200-day MA',ma200)}</div>
+      </div>`;
+    }
+
+    // Position-size calculator (interactive)
+    function posCalc(p, sym){
+      if(!p) return '';
+      const cid='pc_'+sym.replace(/[^A-Za-z0-9]/g,'');
+      return `<div class="poscalc"><h4><i class="ti ti-calculator"></i> size it to your book</h4>
+        <div class="pc-inputs">
+          <div class="pc-field"><label>capital (₹)</label><input type="number" id="${cid}_cap" value="1000000" oninput="sizeIt('${cid}',${p.entry_low},${p.stop})"></div>
+          <div class="pc-field"><label>risk per trade (%)</label><input type="number" id="${cid}_risk" value="1" step="0.25" oninput="sizeIt('${cid}',${p.entry_low},${p.stop})"></div>
+        </div>
+        <div class="pc-out">
+          <div class="pco"><div class="pcok">shares to buy</div><div class="pcov" id="${cid}_sh">—</div></div>
+          <div class="pco"><div class="pcok">position value</div><div class="pcov" id="${cid}_val">—</div></div>
+          <div class="pco"><div class="pcok">max loss at stop</div><div class="pcov" id="${cid}_loss">—</div></div>
+        </div>
+      </div>`;
+    }
+
     if(dr){
       // real debate present - lead with the big verdict banner
       card.innerHTML=`
@@ -640,6 +783,9 @@ function renderLive(data){
         </div>
         ${verdictBanner(dr, vStyle)}
         ${sparkline(s.spark)}
+        ${tradePlan(s.plan)}
+        ${levels(s.fundamentals.details, s.close)}
+        ${posCalc(s.plan, s.symbol)}
         ${detailsHtml}
         <div class="v-body">
           <div class="v-col pro"><h4><i class="ti ti-trending-up"></i>bull case</h4>
@@ -664,6 +810,10 @@ function renderLive(data){
           </div>
           <div class="v-lean"><span class="lean-badge mixed"><i class="ti ti-minus"></i>debate not run</span></div>
         </div>
+        ${sparkline(s.spark)}
+        ${tradePlan(s.plan)}
+        ${levels(s.fundamentals.details, s.close)}
+        ${posCalc(s.plan, s.symbol)}
         ${detailsHtml}
         <div class="v-body" style="grid-template-columns:1fr">
           <div class="v-col"><p class="nodata">${s.technician}</p>
@@ -674,6 +824,11 @@ function renderLive(data){
           <span>Research and education only. Not investment advice. Do your own diligence.</span></div>`;
     }
     list.appendChild(card);
+    // compute the position calculator now (so it shows numbers, not dashes)
+    if(s.plan){
+      const cid='pc_'+s.symbol.replace(/[^A-Za-z0-9]/g,'');
+      setTimeout(()=>sizeIt(cid, s.plan.entry_low, s.plan.stop), 0);
+    }
   });
 
   if(D && D.results && D.actual_cost!=null){
