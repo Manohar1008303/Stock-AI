@@ -16,7 +16,32 @@ from typing import Optional, List
 import requests
 
 _AV = "https://www.alphavantage.co/query"
-_HEADERS = {"User-Agent": "StockAI research"}
+_HEADERS = {
+    "User-Agent": ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                   "AppleWebKit/537.36 (KHTML, like Gecko) "
+                   "Chrome/120.0.0.0 Safari/537.36"),
+    "Accept": "application/json,text/plain,*/*",
+}
+
+_yahoo_session = {"crumb": None, "cookies": None}
+
+
+def _get_yahoo_crumb():
+    if _yahoo_session["crumb"] and _yahoo_session["cookies"] is not None:
+        return _yahoo_session["crumb"], _yahoo_session["cookies"]
+    try:
+        s = requests.Session()
+        s.headers.update(_HEADERS)
+        s.get("https://fc.yahoo.com", timeout=12)
+        r = s.get("https://query1.finance.yahoo.com/v1/test/getcrumb", timeout=12)
+        crumb = r.text.strip() if r.status_code == 200 else None
+        if crumb and "<" not in crumb:
+            _yahoo_session["crumb"] = crumb
+            _yahoo_session["cookies"] = s.cookies
+            return crumb, s.cookies
+    except requests.RequestException:
+        pass
+    return None, None
 
 
 # --- Technician: derived purely from the screener bars we already have -------
