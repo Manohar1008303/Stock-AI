@@ -1,0 +1,18 @@
+# SAMPLE DATA - NOT LIVE MARKET DATA. For exercising screener logic only.
+# These numbers are fabricated for a code demo and must never be presented as
+# real signal or flow into a Telegram alert. Demo mode labels every line.
+#
+# Format: symbol,close,prev_close,volume,avg_volume,sma
+# (avg_volume = trailing avg; sma = the moving average value)
+#
+# Designed to produce a mix: some pass all checks, some fail on one axis,
+# so you can see the pass/fail reasons render correctly.
+symbol,close,prev_close,volume,avg_volume,sma
+DEVYANI,178.5,171.2,4200000,1800000,165.4
+FINCABLES,1245.0,1198.0,980000,410000,1180.5
+LUMAXTECH,1092.0,1061.0,540000,250000,1005.0
+RELIANCE,2890.0,2905.0,3100000,4200000,2850.0
+TCS,3410.0,3395.0,1200000,1900000,3500.0
+INFY,1512.0,1521.0,2100000,2300000,1495.0
+SBIN,812.0,798.0,8900000,3900000,770.0
+ITC,455.0,451.0,900000,5100000,448.0
